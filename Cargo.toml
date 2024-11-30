@@ -29,7 +29,7 @@ inherits = "release"
 debug = true
 
 [[bench]]
-name = "vader_sentiment_comparison"
+name = "compare"
 harness = false
 
 [[bench]]
