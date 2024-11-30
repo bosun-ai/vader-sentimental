@@ -183,9 +183,13 @@ impl<'a> ParsedText<'a> {
     pub fn tokenize(text: &str) -> Vec<UniCase<&str>> {
         let tokens = text
             .split_whitespace()
-            .filter(|s| s.len() > 1)
-            .map(ParsedText::strip_punc_if_word)
-            .map(UniCase::new)
+            .filter_map(|s| {
+                if s.len() <= 1 {
+                    None
+                } else {
+                    Some(UniCase::new(ParsedText::strip_punc_if_word(s)))
+                }
+            })
             .collect();
         tokens
     }
