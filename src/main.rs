@@ -5,7 +5,7 @@
 // }
 
 use clap::Parser;
-use vader_sentiment::SentimentIntensityAnalyzer;
+use vader_sentimental::SentimentIntensityAnalyzer;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]

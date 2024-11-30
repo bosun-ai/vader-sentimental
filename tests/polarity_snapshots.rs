@@ -1,4 +1,4 @@
-use vader_sentiment::SentimentIntensityAnalyzer;
+use vader_sentimental::SentimentIntensityAnalyzer;
 
 #[test]
 fn test_positive() {

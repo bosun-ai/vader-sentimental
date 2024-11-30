@@ -1,5 +1,5 @@
 use unicase::UniCase;
-use vader_sentiment::{
+use vader_sentimental::{
     but_check, demo, ParsedText, SentimentIntensityAnalyzer, EMOJI_LEXICON, LEXICON,
 };
 
