@@ -344,8 +344,8 @@ impl SentimentIntensityAnalyzer<'_> {
     pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
         let text = self.append_emoji_descriptions(text);
         let parsedtext = ParsedText::from_text(&text);
-        let mut sentiments = Vec::new();
         let tokens = &parsedtext.tokens;
+        let mut sentiments = Vec::with_capacity(tokens.len());
 
         for (i, word) in tokens.iter().enumerate() {
             if BOOSTER_DICT.contains_key(word) {
@@ -495,7 +495,7 @@ fn least_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
 // }
 
 fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
-    assert!(i > 2);
+    debug_assert!(i > 2);
     let mut valence = _valence;
     let mut end_i = i + 1;
 
