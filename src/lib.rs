@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 
-use maplit::{convert_args, hashmap, hashset};
+use hashbrown::{HashMap, HashSet};
 use regex::Regex;
 /**
  * If you use the VADER sentiment analysis tools, please cite:
@@ -13,7 +13,6 @@ use regex::Regex;
 // extern crate regex;
 // extern crate unicase;
 use std::cmp::min;
-use std::collections::{HashMap, HashSet};
 use unicase::UniCase;
 
 //empirically derived constants for scaling/amplifying sentiments
@@ -40,7 +39,7 @@ static RAW_EMOJI_LEXICON: &str = include_str!("resources/emoji_utf8_lexicon.txt"
 
 lazy_static! {
 
-    static ref NEGATION_TOKENS: HashSet<UniCase<&'static str>> = convert_args!(hashset!(
+    static ref NEGATION_TOKENS: HashSet<UniCase<&'static str>> = [
         "aint", "arent", "cannot", "cant", "couldnt", "darent", "didnt", "doesnt",
         "ain't", "aren't", "can't", "couldn't", "daren't", "didn't", "doesn't",
         "dont", "hadnt", "hasnt", "havent", "isnt", "mightnt", "mustnt", "neither",
@@ -48,33 +47,35 @@ lazy_static! {
         "neednt", "needn't", "never", "none", "nope", "nor", "not", "nothing", "nowhere",
         "oughtnt", "shant", "shouldnt", "uhuh", "wasnt", "werent",
         "oughtn't", "shan't", "shouldn't", "uh-uh", "wasn't", "weren't",
-        "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite"));
+        "without", "wont", "wouldnt", "won't", "wouldn't", "rarely", "seldom", "despite"].into_iter().map(UniCase::new).collect();
 
-    static ref BOOSTER_DICT: HashMap<UniCase<&'static str>, f64> =  convert_args!(hashmap!(
-         "absolutely"=> B_INCR, "amazingly"=> B_INCR, "awfully"=> B_INCR,
-          "completely"=> B_INCR, "considerable"=> B_INCR, "considerably"=> B_INCR,
-          "decidedly"=> B_INCR, "deeply"=> B_INCR, "effing"=> B_INCR, "enormous"=> B_INCR, "enormously"=> B_INCR,
-          "entirely"=> B_INCR, "especially"=> B_INCR, "exceptional"=> B_INCR, "exceptionally"=> B_INCR,
-          "extreme"=> B_INCR, "extremely"=> B_INCR,
-          "fabulously"=> B_INCR, "flipping"=> B_INCR, "flippin"=> B_INCR, "frackin"=> B_INCR, "fracking"=> B_INCR,
-          "fricking"=> B_INCR, "frickin"=> B_INCR, "frigging"=> B_INCR, "friggin"=> B_INCR, "fully"=> B_INCR,
-          "fuckin"=> B_INCR, "fucking"=> B_INCR, "fuggin"=> B_INCR, "fugging"=> B_INCR,
-          "greatly"=> B_INCR, "hella"=> B_INCR, "highly"=> B_INCR, "hugely"=> B_INCR,
-          "incredible"=> B_INCR, "incredibly"=> B_INCR, "intensely"=> B_INCR,
-          "major"=> B_INCR, "majorly"=> B_INCR, "more"=> B_INCR, "most"=> B_INCR, "particularly"=> B_INCR,
-          "purely"=> B_INCR, "quite"=> B_INCR, "really"=> B_INCR, "remarkably"=> B_INCR,
-          "so"=> B_INCR, "substantially"=> B_INCR,
-          "thoroughly"=> B_INCR, "total"=> B_INCR, "totally"=> B_INCR, "tremendous"=> B_INCR, "tremendously"=> B_INCR,
-          "uber"=> B_INCR, "unbelievably"=> B_INCR, "unusually"=> B_INCR, "utter"=> B_INCR, "utterly"=> B_INCR,
-          "very"=> B_INCR,
-          "almost"=> B_DECR, "barely"=> B_DECR, "hardly"=> B_DECR, "just enough"=> B_DECR,
-          "kind of"=> B_DECR, "kinda"=> B_DECR, "kindof"=> B_DECR, "kind-of"=> B_DECR,
-          "less"=> B_DECR, "little"=> B_DECR, "marginal"=> B_DECR, "marginally"=> B_DECR,
-          "occasional"=> B_DECR, "occasionally"=> B_DECR, "partly"=> B_DECR,
-          "scarce"=> B_DECR, "scarcely"=> B_DECR, "slight"=> B_DECR, "slightly"=> B_DECR, "somewhat"=> B_DECR,
-          "sort of"=> B_DECR, "sorta"=> B_DECR, "sortof"=> B_DECR, "sort-of"=> B_DECR
-));
 
+    static ref BOOSTER_DICT: HashMap<UniCase<&'static str>, f64> =   {
+        let mut map = HashMap::new();
+        for word in &[
+            "absolutely", "amazingly", "awfully", "completely", "considerable", "considerably",
+            "decidedly", "deeply", "effing", "enormous", "enormously", "entirely", "especially",
+            "exceptional", "exceptionally", "extreme", "extremely", "fabulously", "flipping",
+            "flippin", "frackin", "fracking", "fricking", "frickin", "frigging", "friggin", "fully",
+            "fuckin", "fucking", "fuggin", "fugging", "greatly", "hella", "highly", "hugely",
+            "incredible", "incredibly", "intensely", "major", "majorly", "more", "most",
+            "particularly", "purely", "quite", "really", "remarkably", "so", "substantially",
+            "thoroughly", "total", "totally", "tremendous", "tremendously", "uber", "unbelievably",
+            "unusually", "utter", "utterly", "very"
+        ] {
+            map.insert(UniCase::new(*word), B_INCR);
+        }
+        // Adding B_DECR entries
+        for word in &[
+            "almost", "barely", "hardly", "just enough", "kind of", "kinda", "kindof",
+            "kind-of", "less", "little", "marginal", "marginally", "occasional", "occasionally",
+            "partly", "scarce", "scarcely", "slight", "slightly", "somewhat", "sort of", "sorta",
+            "sortof", "sort-of"
+        ] {
+            map.insert(UniCase::new(*word), B_DECR);
+        }
+        map
+    };
     /**
      * These dicts were used in some WIP or planned features in the original
      * I may implement them later if I can understand how they're intended to work
@@ -90,10 +91,17 @@ lazy_static! {
 
 
     // check for special case idioms containing lexicon words
-    static ref SPECIAL_CASE_IDIOMS: HashMap<UniCase<&'static str>, f64> = convert_args!(hashmap!(
-         "the shit" => 3.0, "the bomb" => 3.0, "bad ass" => 1.5, "badass" => 1.5, "yeah right" => -2.0,
-         "kiss of death" => -1.5, "to die for" => 3.0));
-
+    static ref SPECIAL_CASE_IDIOMS: HashMap<UniCase<&'static str>, f64> = {
+        let mut map = HashMap::new();
+        map.insert(UniCase::new("the shit"), 3.0);
+        map.insert(UniCase::new("the bomb"), 3.0);
+        map.insert(UniCase::new("bad ass"), 1.5);
+        map.insert(UniCase::new("badass"), 1.5);
+        map.insert(UniCase::new("yeah right"), -2.0);
+        map.insert(UniCase::new("kiss of death"), -1.5);
+        map.insert(UniCase::new("to die for"), 3.0);
+        map
+    };
     static ref ALL_CAPS_RE: Regex = Regex::new(r"^[A-Z\W]+$").unwrap();
 
     static ref PUNCTUATION: &'static str = "[!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]";
@@ -330,11 +338,13 @@ impl SentimentIntensityAnalyzer<'_> {
             neg = (neg_sum / total).abs();
             neu = (neu_count as f64 / total).abs();
         }
-        let sentiment_dict = hashmap!["neg" => neg,
-                                      "neu" => neu,
-                                      "pos" => pos,
-                                      "compound" => compound];
-        sentiment_dict
+
+        HashMap::from([
+            ("neg", neg),
+            ("neu", neu),
+            ("pos", pos),
+            ("compound", compound),
+        ])
     }
 
     pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
@@ -496,10 +506,10 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
     debug_assert!(i > 2);
     let mut valence = _valence;
     let mut end_i = i + 1;
-    println!(
-        "Running special_idioms_check on {}",
-        tokens.iter().map(ToString::to_string).collect::<String>()
-    );
+    // println!(
+    //     "Running special_idioms_check on {}",
+    //     tokens.iter().map(ToString::to_string).collect::<String>()
+    // );
 
     //if i isn't the last index
     if tokens.len() - 1 > i {
@@ -516,8 +526,8 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
         .to_lowercase();
 
     for (key, val) in SPECIAL_CASE_IDIOMS.iter() {
-        println!("{target_window}");
-        println!("{key}");
+        // println!("{target_window}");
+        // println!("{key}");
         if target_window.contains(key.as_ref()) {
             valence = *val;
             break;
@@ -530,8 +540,8 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
         .join(" ")
         .to_lowercase();
     for (key, val) in BOOSTER_DICT.iter() {
-        println!("{prev_three}");
-        println!("{key}");
+        // println!("{prev_three}");
+        // println!("{key}");
         if prev_three.contains(key.as_ref()) {
             valence += *val;
         }
