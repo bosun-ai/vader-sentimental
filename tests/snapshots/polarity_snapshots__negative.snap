@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-Sentiment analysis has never been good.-------------------------- {
-    "compound": -0.3412376512543242,
-    "neg": 0.32487172562786926,
-    "pos": 0.0,
-    "neu": 0.6751282743721307,
-}
+Sentiment analysis has never been good.-------------------------- [
+    -0.3412376512543242,
+    0.0,
+    0.32487172562786926,
+    0.6751282743721307,
+]

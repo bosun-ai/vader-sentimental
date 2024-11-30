@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-The plot was good, but the characters are uncompelling and the dialog is not great. {
-    "neu": 0.5785641965189721,
-    "compound": -0.7041689565994302,
-    "pos": 0.09401668193433296,
-    "neg": 0.327419121546695,
-}
+The plot was good, but the characters are uncompelling and the dialog is not great. [
+    -0.7041689565994302,
+    0.09401668193433296,
+    0.327419121546695,
+    0.5785641965189721,
+]

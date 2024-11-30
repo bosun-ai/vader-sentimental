@@ -82,7 +82,7 @@ lazy_static! {
 
     // // check for sentiment laden idioms that do not contain lexicon words (future work, not yet implemented)
     // static ref SENTIMENT_LADEN_IDIOMS: HashMap<&'static str, f64> = hashmap![
-    //      "cut the mustard" => 2.0, "hand to mouth" => -2.0,
+    //      "cut the mustard" => 2.0, "hand to mouth" => tokens.len()-2.0,
     //      "back handed" => -2.0, "blow smoke" => -2.0, "blowing smoke" => -2.0,
     //      "upper hand" => 1.0, "break a leg" => 2.0,
     //      "cooking with gas" => 2.0, "in the black" => 2.0, "in the red" => -2.0,
@@ -99,7 +99,7 @@ lazy_static! {
     static ref PUNCTUATION: &'static str = "[!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]";
 
     pub static ref LEXICON: HashMap<UniCase<&'static str>, f64> = parse_raw_lexicon(RAW_LEXICON);
-    pub static ref EMOJI_LEXICON: HashMap<char, &'static str> = parse_raw_emoji_lexicon(RAW_EMOJI_LEXICON);
+    pub static ref EMOJI_LEXICON: HashMap<&'static str, &'static str> = parse_raw_emoji_lexicon(RAW_EMOJI_LEXICON);
 
     static ref STATIC_BUT: UniCase<&'static str> = UniCase::new("but");
     static ref STATIC_THIS: UniCase<&'static str> = UniCase::new("this");
@@ -134,7 +134,7 @@ pub fn parse_raw_lexicon(raw_lexicon: &str) -> HashMap<UniCase<&str>, f64> {
     lex_dict
 }
 
-pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<char, &str> {
+pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<&str, &str> {
     let lines = raw_emoji_lexicon.trim_end_matches("\n").split("\n");
     let mut emoji_dict = HashMap::new();
     for line in lines {
@@ -145,11 +145,7 @@ pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<char, &str> {
         let word = split_line.next().unwrap();
         let desc = split_line.next().unwrap();
 
-        debug_assert! {
-            word.chars().count() == 1,
-            "Emoji lexicon word must be a single character"
-        }
-        emoji_dict.insert(word.chars().take(1).next().unwrap(), desc);
+        emoji_dict.insert(word, desc);
     }
     emoji_dict
 }
@@ -286,7 +282,7 @@ fn sum_sentiment_scores(scores: Vec<f64>) -> (f64, f64, u32) {
 
 pub struct SentimentIntensityAnalyzer<'a> {
     lexicon: &'a HashMap<UniCase<&'a str>, f64>,
-    emoji_lexicon: &'a HashMap<char, &'a str>,
+    emoji_lexicon: &'a HashMap<&'a str, &'a str>,
 }
 
 impl SentimentIntensityAnalyzer<'_> {
@@ -365,7 +361,9 @@ impl SentimentIntensityAnalyzer<'_> {
         let mut result = String::new();
         let mut prev_space = true;
         for chr in text.chars() {
-            if let Some(chr_replacement) = self.emoji_lexicon.get(&chr) {
+            let mut my_buf: [u8; 4] = [0; 4];
+            let cheap_str: &str = chr.encode_utf8(&mut my_buf);
+            if let Some(chr_replacement) = self.emoji_lexicon.get(&cheap_str) {
                 if !prev_space {
                     result.push(' ');
                 }
@@ -498,6 +496,10 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
     debug_assert!(i > 2);
     let mut valence = _valence;
     let mut end_i = i + 1;
+    println!(
+        "Running special_idioms_check on {}",
+        tokens.iter().map(ToString::to_string).collect::<String>()
+    );
 
     //if i isn't the last index
     if tokens.len() - 1 > i {
@@ -514,6 +516,8 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
         .to_lowercase();
 
     for (key, val) in SPECIAL_CASE_IDIOMS.iter() {
+        println!("{target_window}");
+        println!("{key}");
         if target_window.contains(key.as_ref()) {
             valence = *val;
             break;
@@ -526,6 +530,8 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
         .join(" ")
         .to_lowercase();
     for (key, val) in BOOSTER_DICT.iter() {
+        println!("{prev_three}");
+        println!("{key}");
         if prev_three.contains(key.as_ref()) {
             valence += *val;
         }
