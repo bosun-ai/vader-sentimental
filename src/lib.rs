@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use lazy_static::lazy_static;
 
 use hashbrown::{HashMap, HashSet};
@@ -76,6 +77,8 @@ lazy_static! {
         }
         map
     };
+
+    static ref BOOSTER_DICT_EARLY_RETURN: HashSet<UniCase<&'static str>> = BOOSTER_DICT.keys().flat_map(|s| s.split_whitespace()).map(UniCase::new).collect();
     /**
      * These dicts were used in some WIP or planned features in the original
      * I may implement them later if I can understand how they're intended to work
@@ -102,6 +105,9 @@ lazy_static! {
         map.insert(UniCase::new("to die for"), 3.0);
         map
     };
+    // early return if no current tokens are in the special case tokens
+    static ref SPECIAL_CASE_EARLY_RETURN: HashSet<UniCase<&'static str>> = SPECIAL_CASE_IDIOMS.keys().flat_map(|s| s.split_whitespace()).map(UniCase::new).collect();
+
     static ref ALL_CAPS_RE: Regex = Regex::new(r"^[A-Z\W]+$").unwrap();
 
     static ref PUNCTUATION: &'static str = "[!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]";
@@ -521,33 +527,35 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
         end_i = min(i + 3, tokens.len());
     }
 
-    // TODO: We can do this faster by comparing splits?
-    let target_window = tokens[(i - 3)..end_i]
-        .iter()
-        .map(|u| u.as_ref())
-        .collect::<Vec<&str>>()
-        .join(" ")
-        .to_lowercase();
+    if tokens.iter().any(|t| SPECIAL_CASE_EARLY_RETURN.contains(t)) {
+        let target_window = tokens[(i - 3)..end_i]
+            .iter()
+            .map(|u| u.as_ref())
+            .collect::<Vec<&str>>()
+            .join(" ")
+            .to_lowercase();
 
-    for (key, val) in SPECIAL_CASE_IDIOMS.iter() {
-        // println!("{target_window}");
-        // println!("{key}");
-        if target_window.contains(key.as_ref()) {
-            valence = *val;
-            break;
+        for (key, val) in SPECIAL_CASE_IDIOMS.iter() {
+            if target_window.contains(key.as_ref()) {
+                valence = *val;
+                break;
+            }
         }
     }
-    let prev_three = tokens[(i - 3)..i]
-        .iter()
-        .map(|u| u.as_ref())
-        .collect::<Vec<&str>>()
-        .join(" ")
-        .to_lowercase();
-    for (key, val) in BOOSTER_DICT.iter() {
-        // println!("{prev_three}");
-        // println!("{key}");
-        if prev_three.contains(key.as_ref()) {
-            valence += *val;
+
+    if tokens.iter().any(|t| BOOSTER_DICT_EARLY_RETURN.contains(t)) {
+        let prev_three = tokens[(i - 3)..i]
+            .iter()
+            .map(|u| u.as_ref())
+            .collect::<Vec<&str>>()
+            .join(" ")
+            .to_lowercase();
+        for (key, val) in BOOSTER_DICT.iter() {
+            // println!("{prev_three}");
+            // println!("{key}");
+            if prev_three.contains(key.as_ref()) {
+                valence += *val;
+            }
         }
     }
     valence
