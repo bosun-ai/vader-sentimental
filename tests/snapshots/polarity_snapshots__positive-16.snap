@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+Not bad at all--------------------------------------------------- {
+    "compound": 0.43102002306105164,
+    "pos": 0.4871794871794872,
+    "neg": 0.0,
+    "neu": 0.5128205128205129,
+}

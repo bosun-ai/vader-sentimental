@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+The book was only kind of good.---------------------------------- {
+    "neg": 0.0,
+    "compound": 0.38324473176419577,
+    "neu": 0.6971070059254096,
+    "pos": 0.30289299407459047,
+}

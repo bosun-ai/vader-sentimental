@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+Roger Dodger is at least compelling as a variation on the theme.- {
+    "compound": -0.16947302270321746,
+    "neu": 0.8571918395336876,
+    "neg": 0.14280816046631234,
+    "pos": 0.0,
+}
