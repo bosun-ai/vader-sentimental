@@ -23,6 +23,14 @@ insta = "1.41.1"
 criterion = { version = "0.5.1", features = ["html_reports"] }
 vader_sentiment = { version = "0.1.1" }
 
+[profile.bench]
+inherits = "release"
+debug = true
+
 [[bench]]
 name = "vader_sentiment_comparison"
+harness = false
+
+[[bench]]
+name = "sentimental"
 harness = false

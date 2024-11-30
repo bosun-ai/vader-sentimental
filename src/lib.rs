@@ -99,7 +99,7 @@ lazy_static! {
     static ref PUNCTUATION: &'static str = "[!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]";
 
     pub static ref LEXICON: HashMap<UniCase<&'static str>, f64> = parse_raw_lexicon(RAW_LEXICON);
-    pub static ref EMOJI_LEXICON: HashMap<&'static str, &'static str> = parse_raw_emoji_lexicon(RAW_EMOJI_LEXICON);
+    pub static ref EMOJI_LEXICON: HashMap<char, &'static str> = parse_raw_emoji_lexicon(RAW_EMOJI_LEXICON);
 
     static ref STATIC_BUT: UniCase<&'static str> = UniCase::new("but");
     static ref STATIC_THIS: UniCase<&'static str> = UniCase::new("this");
@@ -134,7 +134,7 @@ pub fn parse_raw_lexicon(raw_lexicon: &str) -> HashMap<UniCase<&str>, f64> {
     lex_dict
 }
 
-pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<&str, &str> {
+pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<char, &str> {
     let lines = raw_emoji_lexicon.trim_end_matches("\n").split("\n");
     let mut emoji_dict = HashMap::new();
     for line in lines {
@@ -144,7 +144,12 @@ pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<&str, &str> {
         let mut split_line = line.split('\t');
         let word = split_line.next().unwrap();
         let desc = split_line.next().unwrap();
-        emoji_dict.insert(word, desc);
+
+        debug_assert! {
+            word.chars().count() == 1,
+            "Emoji lexicon word must be a single character"
+        }
+        emoji_dict.insert(word.chars().take(1).next().unwrap(), desc);
     }
     emoji_dict
 }
@@ -281,7 +286,7 @@ fn sum_sentiment_scores(scores: Vec<f64>) -> (f64, f64, u32) {
 
 pub struct SentimentIntensityAnalyzer<'a> {
     lexicon: &'a HashMap<UniCase<&'a str>, f64>,
-    emoji_lexicon: &'a HashMap<&'a str, &'a str>,
+    emoji_lexicon: &'a HashMap<char, &'a str>,
 }
 
 impl SentimentIntensityAnalyzer<'_> {
@@ -360,8 +365,7 @@ impl SentimentIntensityAnalyzer<'_> {
         let mut result = String::new();
         let mut prev_space = true;
         for chr in text.chars() {
-            let chr_string = chr.to_string();
-            if let Some(chr_replacement) = self.emoji_lexicon.get(chr_string.as_str()) {
+            if let Some(chr_replacement) = self.emoji_lexicon.get(&chr) {
                 if !prev_space {
                     result.push(' ');
                 }
