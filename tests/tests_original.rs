@@ -1,6 +1,7 @@
 use unicase::UniCase;
-
-use crate::{but_check, demo, ParsedText, SentimentIntensityAnalyzer, EMOJI_LEXICON, LEXICON};
+use vader_sentiment::{
+    but_check, demo, ParsedText, SentimentIntensityAnalyzer, EMOJI_LEXICON, LEXICON,
+};
 
 #[test]
 fn test_lexicon() {
@@ -36,18 +37,18 @@ fn test_parsed_text() {
     assert!(parsed_messy.has_mixed_caps);
     assert_eq!(parsed_messy.punc_amplifier, 1.416);
 
-    assert!(
-        !ParsedText::has_mixed_caps(&ParsedText::tokenize("yeah!!! I'm aLLERGIC to ShouTING."))
-    );
-    assert!(
-        !ParsedText::has_mixed_caps(&ParsedText::tokenize("OH MAN I LOVE SHOUTING!"))
-    );
-    assert!(
-        ParsedText::has_mixed_caps(&ParsedText::tokenize("I guess I CAN'T MAKE UP MY MIND"))
-    );
-    assert!(
-        ParsedText::has_mixed_caps(&ParsedText::tokenize("Hmm, yeah ME NEITHER"))
-    );
+    assert!(!ParsedText::has_mixed_caps(&ParsedText::tokenize(
+        "yeah!!! I'm aLLERGIC to ShouTING."
+    )));
+    assert!(!ParsedText::has_mixed_caps(&ParsedText::tokenize(
+        "OH MAN I LOVE SHOUTING!"
+    )));
+    assert!(ParsedText::has_mixed_caps(&ParsedText::tokenize(
+        "I guess I CAN'T MAKE UP MY MIND"
+    )));
+    assert!(ParsedText::has_mixed_caps(&ParsedText::tokenize(
+        "Hmm, yeah ME NEITHER"
+    )));
 }
 
 #[test]

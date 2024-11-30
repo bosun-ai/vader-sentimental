@@ -16,9 +16,6 @@ use std::cmp::min;
 use std::collections::{HashMap, HashSet};
 use unicase::UniCase;
 
-#[cfg(test)]
-mod tests;
-
 //empirically derived constants for scaling/amplifying sentiments
 const B_INCR: f64 = 0.293;
 const B_DECR: f64 = -0.293;
@@ -155,15 +152,15 @@ pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<&str, &str> {
 /**
  *  Stores tokens and useful info about text
  **/
-struct ParsedText<'a> {
-    tokens: Vec<UniCase<&'a str>>,
-    has_mixed_caps: bool,
-    punc_amplifier: f64,
+pub struct ParsedText<'a> {
+    pub tokens: Vec<UniCase<&'a str>>,
+    pub has_mixed_caps: bool,
+    pub punc_amplifier: f64,
 }
 
 impl<'a> ParsedText<'a> {
     //Tokenizes and extracts useful properties of input text
-    fn from_text(text: &'a str) -> ParsedText {
+    pub fn from_text(text: &'a str) -> ParsedText {
         let _tokens = ParsedText::tokenize(text);
         let _has_mixed_caps = ParsedText::has_mixed_caps(&_tokens);
         let _punc_amplifier = ParsedText::get_punctuation_emphasis(text);
@@ -174,7 +171,7 @@ impl<'a> ParsedText<'a> {
         }
     }
 
-    fn tokenize(text: &str) -> Vec<UniCase<&str>> {
+    pub fn tokenize(text: &str) -> Vec<UniCase<&str>> {
         let tokens = text
             .split_whitespace()
             .filter(|s| s.len() > 1)
@@ -195,7 +192,7 @@ impl<'a> ParsedText<'a> {
     }
 
     // Determines if message has a mix of both all caps and non all caps words
-    fn has_mixed_caps<S: AsRef<str>>(tokens: &[S]) -> bool {
+    pub fn has_mixed_caps<S: AsRef<str>>(tokens: &[S]) -> bool {
         let (mut has_caps, mut has_non_caps) = (false, false);
         for token in tokens.iter() {
             if is_all_caps(token.as_ref()) {
@@ -304,7 +301,7 @@ impl SentimentIntensityAnalyzer<'_> {
         }
     }
 
-    fn get_total_sentiment(
+    pub fn get_total_sentiment(
         &self,
         sentiments: Vec<f64>,
         punct_emph_amplifier: f64,
@@ -359,7 +356,7 @@ impl SentimentIntensityAnalyzer<'_> {
     }
 
     //Removes emoji and appends their description to the end the input text
-    fn append_emoji_descriptions(&self, text: &str) -> String {
+    pub fn append_emoji_descriptions(&self, text: &str) -> String {
         let mut result = String::new();
         let mut prev_space = true;
         for chr in text.chars() {
@@ -451,7 +448,7 @@ fn negation_check(valence: f64, tokens: &[UniCase<&str>], start_i: usize, i: usi
 
 // If "but" is in the tokens, scales down the sentiment of words before "but" and
 // adds more emphasis to the words after
-fn but_check(tokens: &[UniCase<&str>], sentiments: &mut Vec<f64>) {
+pub fn but_check(tokens: &[UniCase<&str>], sentiments: &mut Vec<f64>) {
     if let Some(but_index) = tokens.iter().position(|&s| s == *STATIC_BUT) {
         for i in 0..sentiments.len() {
             if i < but_index {
