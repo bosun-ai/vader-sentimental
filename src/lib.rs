@@ -1,29 +1,29 @@
+use lazy_static::lazy_static;
+
+use maplit::{convert_args, hashmap, hashset};
+use regex::Regex;
 /**
  * If you use the VADER sentiment analysis tools, please cite:
  * Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for
  * Sentiment Analysis of Social Media Text. Eighth International Conference on
  * Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
  **/
-
-
-#[macro_use] extern crate maplit;
-#[macro_use] extern crate lazy_static;
-extern crate regex;
-extern crate unicase;
-
+// #[macro_use] extern crate maplit;
+// #[macro_use] extern crate lazy_static;
+// extern crate regex;
+// extern crate unicase;
 use std::cmp::min;
 use std::collections::{HashMap, HashSet};
-use regex::Regex;
 use unicase::UniCase;
 
 #[cfg(test)]
 mod tests;
 
 //empirically derived constants for scaling/amplifying sentiments
-const B_INCR: f64 =  0.293;
+const B_INCR: f64 = 0.293;
 const B_DECR: f64 = -0.293;
 
-const C_INCR:   f64 =  0.733;
+const C_INCR: f64 = 0.733;
 const NEGATION_SCALAR: f64 = -0.740;
 
 //sentiment increases for text with question or exclamation marks
@@ -119,7 +119,6 @@ lazy_static! {
 
 }
 
-
 /**
  * Takes the raw text of the lexicon files and creates HashMaps
  **/
@@ -128,11 +127,11 @@ pub fn parse_raw_lexicon(raw_lexicon: &str) -> HashMap<UniCase<&str>, f64> {
     let mut lex_dict = HashMap::new();
     for line in lines {
         if line.is_empty() {
-          continue;
+            continue;
         }
         let mut split_line = line.split('\t');
         let word = split_line.next().unwrap();
-        let val  = split_line.next().unwrap();
+        let val = split_line.next().unwrap();
         lex_dict.insert(UniCase::new(word), val.parse().unwrap());
     }
     lex_dict
@@ -143,11 +142,11 @@ pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<&str, &str> {
     let mut emoji_dict = HashMap::new();
     for line in lines {
         if line.is_empty() {
-          continue;
+            continue;
         }
         let mut split_line = line.split('\t');
         let word = split_line.next().unwrap();
-        let desc  = split_line.next().unwrap();
+        let desc = split_line.next().unwrap();
         emoji_dict.insert(word, desc);
     }
     emoji_dict
@@ -172,15 +171,16 @@ impl<'a> ParsedText<'a> {
             tokens: _tokens,
             has_mixed_caps: _has_mixed_caps,
             punc_amplifier: _punc_amplifier,
-         }
+        }
     }
 
     fn tokenize(text: &str) -> Vec<UniCase<&str>> {
-        let tokens = text.split_whitespace()
-                                    .filter(|s| s.len() > 1)
-                                    .map(|s| ParsedText::strip_punc_if_word(s))
-                                    .map(UniCase::new)
-                                    .collect();
+        let tokens = text
+            .split_whitespace()
+            .filter(|s| s.len() > 1)
+            .map(|s| ParsedText::strip_punc_if_word(s))
+            .map(UniCase::new)
+            .collect();
         tokens
     }
 
@@ -212,15 +212,15 @@ impl<'a> ParsedText<'a> {
 
     //uses empirical values to determine how the use of '?' and '!' contribute to sentiment
     fn get_punctuation_emphasis(text: &str) -> f64 {
-       let emark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'!').count() as i32;
-       let qmark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'?').count() as i32;
+        let emark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'!').count() as i32;
+        let qmark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'?').count() as i32;
 
-       let emark_emph = min(emark_count, MAX_EMARK) as f64 * EMARK_INCR;
-       let mut qmark_emph = (qmark_count as f64) * QMARK_INCR;
-       if qmark_count > MAX_QMARK {
-           qmark_emph = MAX_QMARK_INCR;
-       }
-       qmark_emph + emark_emph
+        let emark_emph = min(emark_count, MAX_EMARK) as f64 * EMARK_INCR;
+        let mut qmark_emph = (qmark_count as f64) * QMARK_INCR;
+        if qmark_count > MAX_QMARK {
+            qmark_emph = MAX_QMARK_INCR;
+        }
+        qmark_emph + emark_emph
     }
 }
 
@@ -288,22 +288,27 @@ pub struct SentimentIntensityAnalyzer<'a> {
 }
 
 impl<'a> SentimentIntensityAnalyzer<'a> {
-    pub fn new() -> SentimentIntensityAnalyzer<'static>{
+    pub fn new() -> SentimentIntensityAnalyzer<'static> {
         SentimentIntensityAnalyzer {
             lexicon: &LEXICON,
             emoji_lexicon: &EMOJI_LEXICON,
         }
     }
 
-    pub fn from_lexicon<'b>(_lexicon: &'b HashMap<UniCase<&str>, f64>) ->
-                                        SentimentIntensityAnalyzer<'b> {
+    pub fn from_lexicon<'b>(
+        _lexicon: &'b HashMap<UniCase<&str>, f64>,
+    ) -> SentimentIntensityAnalyzer<'b> {
         SentimentIntensityAnalyzer {
             lexicon: _lexicon,
             emoji_lexicon: &EMOJI_LEXICON,
         }
     }
 
-    fn get_total_sentiment(&self, sentiments: Vec<f64>, punct_emph_amplifier: f64) -> HashMap<&str, f64> {
+    fn get_total_sentiment(
+        &self,
+        sentiments: Vec<f64>,
+        punct_emph_amplifier: f64,
+    ) -> HashMap<&str, f64> {
         let (mut neg, mut neu, mut pos, mut compound) = (0f64, 0f64, 0f64, 0f64);
         if sentiments.len() > 0 {
             let mut total_sentiment: f64 = sentiments.iter().sum();
@@ -334,7 +339,7 @@ impl<'a> SentimentIntensityAnalyzer<'a> {
         sentiment_dict
     }
 
-    pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64>{
+    pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
         let text = self.append_emoji_descriptions(text);
         let parsedtext = ParsedText::from_text(&text);
         let mut sentiments = Vec::new();
@@ -343,8 +348,7 @@ impl<'a> SentimentIntensityAnalyzer<'a> {
         for (i, word) in tokens.iter().enumerate() {
             if BOOSTER_DICT.contains_key(word) {
                 sentiments.push(0f64);
-            } else if i < tokens.len() - 1 && word == &*STATIC_KIND
-                                  && tokens[i + 1] == *STATIC_OF {
+            } else if i < tokens.len() - 1 && word == &*STATIC_KIND && tokens[i + 1] == *STATIC_OF {
                 sentiments.push(0f64);
             } else {
                 sentiments.push(self.sentiment_valence(&parsedtext, word, i));
@@ -387,9 +391,9 @@ impl<'a> SentimentIntensityAnalyzer<'a> {
                 }
             }
             for start_i in 0..3 {
-                if i > start_i && !self.lexicon.contains_key(
-                                &tokens[i - start_i - 1]) {
-                    let mut s = scalar_inc_dec(&tokens[i - start_i - 1], valence, parsed.has_mixed_caps);
+                if i > start_i && !self.lexicon.contains_key(&tokens[i - start_i - 1]) {
+                    let mut s =
+                        scalar_inc_dec(&tokens[i - start_i - 1], valence, parsed.has_mixed_caps);
                     if start_i == 1 {
                         s *= 0.95;
                     } else if start_i == 2 {
@@ -412,35 +416,37 @@ impl<'a> SentimentIntensityAnalyzer<'a> {
  * Check for specific patterns or tokens, and modify sentiment as needed
  **/
 fn negation_check(valence: f64, tokens: &[UniCase<&str>], start_i: usize, i: usize) -> f64 {
-   let mut valence = valence;
-   if start_i == 0 {
-       if is_negated(&tokens[i - start_i - 1]) {
-           valence *= NEGATION_SCALAR;
-       }
-   } else if start_i == 1 {
-       if tokens[i - 2] == *STATIC_NEVER &&
-         (tokens[i - 1] == *STATIC_SO ||
-          tokens[i - 1] == *STATIC_THIS) {
-           valence *= 1.25
-       } else if tokens[i - 2] == *STATIC_WITHOUT && tokens[i - 1] == *STATIC_DOUBT {
-           valence *= 1.0
-       } else if is_negated(&tokens[i - start_i - 1]) {
-           valence *= NEGATION_SCALAR;
-       }
-   } else if start_i == 2 {
-       if tokens[i - 3] == *STATIC_NEVER &&
-          tokens[i - 2] == *STATIC_SO || tokens[i - 2] == *STATIC_THIS||
-          tokens[i - 1] == *STATIC_SO || tokens[i - 1] == *STATIC_THIS {
-           valence *= 1.25
-       } else if tokens[i - 3] == *STATIC_WITHOUT &&
-                 tokens[i - 2] == *STATIC_DOUBT ||
-                 tokens[i - 1] == *STATIC_DOUBT {
-           valence *= 1.0;
-       } else if is_negated(&tokens[i - start_i - 1]) {
-           valence *= NEGATION_SCALAR;
-       }
-   }
-   valence
+    let mut valence = valence;
+    if start_i == 0 {
+        if is_negated(&tokens[i - start_i - 1]) {
+            valence *= NEGATION_SCALAR;
+        }
+    } else if start_i == 1 {
+        if tokens[i - 2] == *STATIC_NEVER
+            && (tokens[i - 1] == *STATIC_SO || tokens[i - 1] == *STATIC_THIS)
+        {
+            valence *= 1.25
+        } else if tokens[i - 2] == *STATIC_WITHOUT && tokens[i - 1] == *STATIC_DOUBT {
+            valence *= 1.0
+        } else if is_negated(&tokens[i - start_i - 1]) {
+            valence *= NEGATION_SCALAR;
+        }
+    } else if start_i == 2 {
+        if tokens[i - 3] == *STATIC_NEVER && tokens[i - 2] == *STATIC_SO
+            || tokens[i - 2] == *STATIC_THIS
+            || tokens[i - 1] == *STATIC_SO
+            || tokens[i - 1] == *STATIC_THIS
+        {
+            valence *= 1.25
+        } else if tokens[i - 3] == *STATIC_WITHOUT && tokens[i - 2] == *STATIC_DOUBT
+            || tokens[i - 1] == *STATIC_DOUBT
+        {
+            valence *= 1.0;
+        } else if is_negated(&tokens[i - start_i - 1]) {
+            valence *= NEGATION_SCALAR;
+        }
+    }
+    valence
 }
 
 // If "but" is in the tokens, scales down the sentiment of words before "but" and
@@ -455,16 +461,18 @@ fn but_check(tokens: &[UniCase<&str>], sentiments: &mut Vec<f64>) {
                     sentiments[i] *= 1.5;
                 }
             }
-        },
+        }
         None => return,
     }
 }
 
 fn least_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
     let mut valence = _valence;
-    if i > 1 && tokens[i - 1] == *STATIC_LEAST
-             && tokens[i - 2] == *STATIC_AT
-             && tokens[i - 2] == *STATIC_VERY {
+    if i > 1
+        && tokens[i - 1] == *STATIC_LEAST
+        && tokens[i - 2] == *STATIC_AT
+        && tokens[i - 2] == *STATIC_VERY
+    {
         valence *= NEGATION_SCALAR;
     } else if i > 0 && tokens[i - 1] == *STATIC_LEAST {
         valence *= NEGATION_SCALAR;
@@ -500,7 +508,12 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
     }
 
     // TODO: We can do this faster by comparing splits?
-    let target_window = tokens[(i - 3)..end_i].iter().map(|u| u.as_ref()).collect::<Vec<&str>>().join(" ").to_lowercase();
+    let target_window = tokens[(i - 3)..end_i]
+        .iter()
+        .map(|u| u.as_ref())
+        .collect::<Vec<&str>>()
+        .join(" ")
+        .to_lowercase();
 
     for (key, val) in SPECIAL_CASE_IDIOMS.iter() {
         if target_window.contains(key.as_ref()) {
@@ -508,7 +521,12 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
             break;
         }
     }
-    let prev_three = tokens[(i - 3)..i].iter().map(|u| u.as_ref()).collect::<Vec<&str>>().join(" ").to_lowercase();
+    let prev_three = tokens[(i - 3)..i]
+        .iter()
+        .map(|u| u.as_ref())
+        .collect::<Vec<&str>>()
+        .join(" ")
+        .to_lowercase();
     for (key, val) in BOOSTER_DICT.iter() {
         if prev_three.contains(key.as_ref()) {
             valence += *val;
