@@ -38,8 +38,8 @@ const MAX_QMARK_INCR: f64 = 0.96;
 
 const NORMALIZATION_ALPHA: f64 = 15.0;
 
-static RAW_LEXICON: &'static str = include_str!("resources/vader_lexicon.txt");
-static RAW_EMOJI_LEXICON: &'static str = include_str!("resources/emoji_utf8_lexicon.txt");
+static RAW_LEXICON: &str = include_str!("resources/vader_lexicon.txt");
+static RAW_EMOJI_LEXICON: &str = include_str!("resources/emoji_utf8_lexicon.txt");
 
 lazy_static! {
 
@@ -178,7 +178,7 @@ impl<'a> ParsedText<'a> {
         let tokens = text
             .split_whitespace()
             .filter(|s| s.len() > 1)
-            .map(|s| ParsedText::strip_punc_if_word(s))
+            .map(ParsedText::strip_punc_if_word)
             .map(UniCase::new)
             .collect();
         tokens
@@ -287,7 +287,7 @@ pub struct SentimentIntensityAnalyzer<'a> {
     emoji_lexicon: &'a HashMap<&'a str, &'a str>,
 }
 
-impl<'a> SentimentIntensityAnalyzer<'a> {
+impl SentimentIntensityAnalyzer<'_> {
     pub fn new() -> SentimentIntensityAnalyzer<'static> {
         SentimentIntensityAnalyzer {
             lexicon: &LEXICON,
@@ -310,7 +310,7 @@ impl<'a> SentimentIntensityAnalyzer<'a> {
         punct_emph_amplifier: f64,
     ) -> HashMap<&str, f64> {
         let (mut neg, mut neu, mut pos, mut compound) = (0f64, 0f64, 0f64, 0f64);
-        if sentiments.len() > 0 {
+        if !sentiments.is_empty() {
             let mut total_sentiment: f64 = sentiments.iter().sum();
             if total_sentiment > 0f64 {
                 total_sentiment += punct_emph_amplifier;
@@ -452,17 +452,14 @@ fn negation_check(valence: f64, tokens: &[UniCase<&str>], start_i: usize, i: usi
 // If "but" is in the tokens, scales down the sentiment of words before "but" and
 // adds more emphasis to the words after
 fn but_check(tokens: &[UniCase<&str>], sentiments: &mut Vec<f64>) {
-    match tokens.iter().position(|&s| s == *STATIC_BUT) {
-        Some(but_index) => {
-            for i in 0..sentiments.len() {
-                if i < but_index {
-                    sentiments[i] *= 0.5;
-                } else if i > but_index {
-                    sentiments[i] *= 1.5;
-                }
+    if let Some(but_index) = tokens.iter().position(|&s| s == *STATIC_BUT) {
+        for i in 0..sentiments.len() {
+            if i < but_index {
+                sentiments[i] *= 0.5;
+            } else if i > but_index {
+                sentiments[i] *= 1.5;
             }
         }
-        None => return,
     }
 }
 
@@ -497,7 +494,7 @@ fn least_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
 // }
 
 fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
-    assert_eq!(i > 2, true);
+    assert!(i > 2);
     let mut valence = _valence;
     let mut end_i = i + 1;
 

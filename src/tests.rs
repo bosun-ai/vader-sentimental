@@ -33,24 +33,20 @@ fn test_parsed_text() {
             .map(|r| UniCase::new(*r))
             .collect();
     assert_eq!(parsed_messy.tokens, expected_text);
-    assert_eq!(parsed_messy.has_mixed_caps, true);
+    assert!(parsed_messy.has_mixed_caps);
     assert_eq!(parsed_messy.punc_amplifier, 1.416);
 
-    assert_eq!(
-        ParsedText::has_mixed_caps(&ParsedText::tokenize("yeah!!! I'm aLLERGIC to ShouTING.")),
-        false
+    assert!(
+        !ParsedText::has_mixed_caps(&ParsedText::tokenize("yeah!!! I'm aLLERGIC to ShouTING."))
     );
-    assert_eq!(
-        ParsedText::has_mixed_caps(&ParsedText::tokenize("OH MAN I LOVE SHOUTING!")),
-        false
+    assert!(
+        !ParsedText::has_mixed_caps(&ParsedText::tokenize("OH MAN I LOVE SHOUTING!"))
     );
-    assert_eq!(
-        ParsedText::has_mixed_caps(&ParsedText::tokenize("I guess I CAN'T MAKE UP MY MIND")),
-        true
+    assert!(
+        ParsedText::has_mixed_caps(&ParsedText::tokenize("I guess I CAN'T MAKE UP MY MIND"))
     );
-    assert_eq!(
-        ParsedText::has_mixed_caps(&ParsedText::tokenize("Hmm, yeah ME NEITHER")),
-        true
+    assert!(
+        ParsedText::has_mixed_caps(&ParsedText::tokenize("Hmm, yeah ME NEITHER"))
     );
 }
 
