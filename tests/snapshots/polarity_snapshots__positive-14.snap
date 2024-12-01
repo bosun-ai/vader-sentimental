@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-Make sure you :) or :D today!------------------------------------ [
-    0.0,
-    0.2785903329154479,
-    0.7214096670845521,
-    0.8849007859213294,
-]
+Make sure you :) or :D today!------------------------------------ SentimentIntensity {
+    neg: 0.0,
+    neu: 0.2785903329154479,
+    pos: 0.7214096670845521,
+    compound: 0.8849007859213294,
+}

@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-On the other hand, VADER is quite bad ass------------------------ [
-    0.0,
-    0.4057892601109157,
-    0.5942107398890843,
-    0.8310114274420448,
-]
+On the other hand, VADER is quite bad ass------------------------ SentimentIntensity {
+    neg: 0.0,
+    neu: 0.4057892601109157,
+    pos: 0.5942107398890843,
+    compound: 0.8310114274420448,
+}

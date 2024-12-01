@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-The book was good.----------------------------------------------- [
-    0.0,
-    0.44043357076016854,
-    0.4915254237288135,
-    0.5084745762711864,
-]
+The book was good.----------------------------------------------- SentimentIntensity {
+    neg: 0.0,
+    neu: 0.5084745762711864,
+    pos: 0.4915254237288135,
+    compound: 0.44043357076016854,
+}

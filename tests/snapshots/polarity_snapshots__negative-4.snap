@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-With VADER, sentiment analysis is the shit!---------------------- [
-    0.0,
-    0.41702293043140304,
-    0.582977069568597,
-    0.6476443261853029,
-]
+With VADER, sentiment analysis is the shit!---------------------- SentimentIntensity {
+    neg: 0.0,
+    neu: 0.582977069568597,
+    pos: 0.41702293043140304,
+    compound: 0.6476443261853029,
+}

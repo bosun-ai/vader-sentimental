@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-VADER is smart, handsome, and funny.----------------------------- [
-    0.0,
-    0.2542372881355932,
-    0.7457627118644068,
-    0.8316320352807864,
-]
+VADER is smart, handsome, and funny.----------------------------- SentimentIntensity {
+    neg: 0.0,
+    neu: 0.2542372881355932,
+    pos: 0.7457627118644068,
+    compound: 0.8316320352807864,
+}

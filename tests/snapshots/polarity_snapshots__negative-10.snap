@@ -2,9 +2,9 @@
 source: tests/polarity_snapshots.rs
 expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
 ---
-Roger Dodger is at least compelling as a variation on the theme.- [
-    -0.16947302270321746,
-    0.0,
-    0.14280816046631234,
-    0.8571918395336876,
-]
+Roger Dodger is at least compelling as a variation on the theme.- SentimentIntensity {
+    neg: 0.14280816046631234,
+    neu: 0.8571918395336876,
+    pos: 0.0,
+    compound: -0.16947302270321746,
+}

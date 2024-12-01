@@ -41,13 +41,13 @@ VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-ba
 ### Output
 
 ```rust
-{
+SentimentIntensity {
     "compound": 0.8316320352807864,
     "pos": 0.7457627118644068,
     "neg": 0.0,
     "neu": 0.2542372881355932
 }
-{
+SentimentIntensity {
     "compound": 0.9226571915792521,
     "pos": 0.7540988645515071,
     "neg": 0.0,
@@ -65,15 +65,3 @@ For questions, please contact:
 C.J. Hutto
 Georgia Institute of Technology, Atlanta, GA 30032  
 cjhutto [at] gatech [dot] edu
-
-# Demo
-
-You can run a full demo including cases with sarcasm, negation, idioms, and punctuation with this code.
-
-```rust
-extern crate vader_sentiment;
-
-fn main() {
-    vader_sentiment::demo::run_demo();
-}
-```

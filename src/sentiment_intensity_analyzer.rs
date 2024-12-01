@@ -13,6 +13,16 @@ use crate::{
 use hashbrown::HashMap;
 use unicase::UniCase;
 
+/// Return value of the `polarity_scores` method
+#[derive(Debug, Clone)]
+pub struct SentimentIntensity {
+    pub neg: f64,
+    pub neu: f64,
+    pub pos: f64,
+    pub compound: f64,
+}
+
+#[derive(Debug, Clone)]
 pub struct SentimentIntensityAnalyzer<'a> {
     lexicon: &'a HashMap<UniCase<&'a str>, f64>,
     emoji_lexicon: &'a HashMap<&'a str, &'a str>,
@@ -28,22 +38,13 @@ impl SentimentIntensityAnalyzer<'_> {
     }
 
     #[must_use]
-    pub fn from_lexicon<'b>(
-        lexicon: &'b HashMap<UniCase<&str>, f64>,
-    ) -> SentimentIntensityAnalyzer<'b> {
-        SentimentIntensityAnalyzer {
-            lexicon,
-            emoji_lexicon: &EMOJI_LEXICON,
-        }
-    }
-
-    #[must_use]
     #[allow(clippy::similar_names)]
-    pub fn get_total_sentiment(
+    #[allow(clippy::unused_self)]
+    fn get_total_sentiment(
         &self,
         sentiments: Vec<f64>,
         punct_emph_amplifier: f64,
-    ) -> HashMap<&str, f64> {
+    ) -> SentimentIntensity {
         let (mut neg, mut neu, mut pos, mut compound) = (0f64, 0f64, 0f64, 0f64);
         if !sentiments.is_empty() {
             let mut total_sentiment: f64 = sentiments.iter().sum();
@@ -68,17 +69,17 @@ impl SentimentIntensityAnalyzer<'_> {
             neu = (f64::from(neu_count) / total).abs();
         }
 
-        HashMap::from([
-            ("neg", neg),
-            ("neu", neu),
-            ("pos", pos),
-            ("compound", compound),
-        ])
+        SentimentIntensity {
+            neg,
+            neu,
+            pos,
+            compound,
+        }
     }
 
     #[must_use]
     #[allow(clippy::if_same_then_else)]
-    pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
+    pub fn polarity_scores(&self, text: &str) -> SentimentIntensity {
         let text = self.append_emoji_descriptions(text);
         let parsedtext = ParsedText::from_text(&text);
         let tokens = &parsedtext.tokens;

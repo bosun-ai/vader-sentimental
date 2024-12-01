@@ -30,12 +30,7 @@ fn test_positive() {
 
     let analyzer = SentimentIntensityAnalyzer::new();
     for sentence in sentences {
-        let mut scores = analyzer
-            .polarity_scores(sentence)
-            .into_values()
-            .collect::<Vec<_>>();
-
-        scores.sort_by(f64::total_cmp);
+        let scores = analyzer.polarity_scores(sentence);
 
         insta::assert_snapshot!(format!("{:-<65} {:#?}", sentence, scores));
     }
@@ -61,12 +56,7 @@ fn test_negative() {
 
     let analyzer = SentimentIntensityAnalyzer::new();
     for sentence in tricky_sentences {
-        let mut scores = analyzer
-            .polarity_scores(sentence)
-            .into_values()
-            .collect::<Vec<_>>();
-
-        scores.sort_by(f64::total_cmp);
+        let scores = analyzer.polarity_scores(sentence);
 
         insta::assert_snapshot!(format!("{:-<65} {:#?}", sentence, scores));
     }
