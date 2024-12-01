@@ -57,7 +57,7 @@ SentimentIntensity {
 
 ## Performance
 
-`vader-sentimental` is signficantly faster than the original implementation. Criterion benches are provided.
+`vader-sentimental` is significantly faster than the original implementation. Criterion benches are provided.
 
 <div align="center">
     <img src="https://github.com/bosun-ai/vader-sentimental/blob/master/images/performance.svg" alt="performance" width="100%" >
