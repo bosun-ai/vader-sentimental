@@ -38,3 +38,13 @@ harness = false
 [[bench]]
 name = "sentimental"
 harness = false
+
+[lints.rust]
+unsafe_code = "forbid"
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(coverage,coverage_nightly)',
+] }
+
+[lints.clippy]
+cargo = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
