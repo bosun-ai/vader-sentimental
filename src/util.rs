@@ -1,6 +1,8 @@
 use unicase::UniCase;
 
-use crate::static_resources::{ALL_CAPS_RE, BOOSTER_DICT, C_INCR, NEGATION_TOKENS, NORMALIZATION_ALPHA};
+use crate::static_resources::{
+    ALL_CAPS_RE, BOOSTER_DICT, C_INCR, NEGATION_TOKENS, NORMALIZATION_ALPHA,
+};
 
 //Checks if all letters in token are capitalized
 pub(crate) fn is_all_caps<S: AsRef<str>>(token: S) -> bool {
