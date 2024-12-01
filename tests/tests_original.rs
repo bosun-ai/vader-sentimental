@@ -1,6 +1,6 @@
 use unicase::UniCase;
 use vader_sentimental::{
-    but_check, demo, ParsedText, SentimentIntensityAnalyzer, EMOJI_LEXICON, LEXICON,
+    but_check, ParsedText, SentimentIntensityAnalyzer, EMOJI_LEXICON, LEXICON,
 };
 
 #[test]
@@ -65,11 +65,6 @@ fn but_check_test() {
         sents,
         vec![0.25, 0.05, 0.0, 0.1, 0.6, 0.375, 0.75, 0.75, 0.75, 0.75]
     );
-}
-
-#[test]
-fn demo_test() {
-    demo::run_demo();
 }
 
 #[test]

@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use lazy_static::lazy_static;
 
 use hashbrown::{HashMap, HashSet};
@@ -9,10 +8,6 @@ use regex::Regex;
  * Sentiment Analysis of Social Media Text. Eighth International Conference on
  * Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
  **/
-// #[macro_use] extern crate maplit;
-// #[macro_use] extern crate lazy_static;
-// extern crate regex;
-// extern crate unicase;
 use std::cmp::min;
 use unicase::UniCase;
 
@@ -560,5 +555,3 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
     }
     valence
 }
-
-pub mod demo;

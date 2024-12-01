@@ -1,6 +1,6 @@
-use crate::SentimentIntensityAnalyzer;
+use vader_sentimental::SentimentIntensityAnalyzer;
 
-pub fn run_demo() {
+pub fn main() {
     let sentences = vec![
         "VADER is smart, handsome, and funny.", // positive sentence example
         "VADER is smart, handsome, and funny!",
