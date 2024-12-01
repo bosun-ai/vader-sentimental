@@ -1,15 +1,18 @@
 [package]
 name = "vader-sentimental"
-version = "0.1.1"
+version = "0.1.0"
 authors = [
+  "Timon Vonk <mail@timonv.nl>",
   "Chris <chriswong21@berkeley.edu>",
   "Mariana Meireles <mariana@psychonautgirl.space>",
 ]
 license = "MIT"
-description = "Bindings for Rust from the original Python VaderSentiment analysis tool."
-repository = "https://github.com/ckw017/vader-sentiment-rust"
-documentation = "https://docs.rs/vader_sentiment"
+description = "A faster Rust version from the original Python VaderSentiment analysis tool."
+repository = "https://github.com/bosun-ai/vader-sentimental"
+documentation = "https://docs.rs/vader_sentimental"
 edition = "2021"
+keywords = ["nlp", "text-analysis", "sentiment-analysis"]
+categories = ["text-processing", "parsing"]
 
 [dependencies]
 regex = "1.3.1"
