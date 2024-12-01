@@ -153,6 +153,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn test_lexicon() {
         assert_eq!(*LEXICON.get(&UniCase::new("feudally")).unwrap(), -0.6);
         assert_eq!(*LEXICON.get(&UniCase::new("irrationalism")).unwrap(), -1.5);

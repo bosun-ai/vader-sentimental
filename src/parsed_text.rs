@@ -2,7 +2,9 @@ use std::cmp::min;
 
 use unicase::UniCase;
 
-use crate::static_resources::{EMARK_INCR, MAX_EMARK, MAX_QMARK, MAX_QMARK_INCR, PUNCTUATION, QMARK_INCR};
+use crate::static_resources::{
+    EMARK_INCR, MAX_EMARK, MAX_QMARK, MAX_QMARK_INCR, PUNCTUATION, QMARK_INCR,
+};
 use crate::util::is_all_caps;
 
 /**
@@ -14,16 +16,16 @@ pub struct ParsedText<'a> {
     pub punc_amplifier: f64,
 }
 
-impl<'a> ParsedText<'a> {
+impl ParsedText<'_> {
     //Tokenizes and extracts useful properties of input text
-    pub fn from_text(text: &'a str) -> ParsedText {
-        let _tokens = ParsedText::tokenize(text);
-        let _has_mixed_caps = ParsedText::has_mixed_caps(&_tokens);
-        let _punc_amplifier = ParsedText::get_punctuation_emphasis(text);
+    pub fn from_text(text: &str) -> ParsedText<'_> {
+        let tokens = ParsedText::tokenize(text);
+        let has_mixed_caps = ParsedText::has_mixed_caps(&tokens);
+        let punc_amplifier = ParsedText::get_punctuation_emphasis(text);
         ParsedText {
-            tokens: _tokens,
-            has_mixed_caps: _has_mixed_caps,
-            punc_amplifier: _punc_amplifier,
+            tokens,
+            has_mixed_caps,
+            punc_amplifier,
         }
     }
 
@@ -68,9 +70,15 @@ impl<'a> ParsedText<'a> {
     }
 
     //uses empirical values to determine how the use of '?' and '!' contribute to sentiment
+    // TODO: Floating points here is a concern, use `rust_decimal` instead.
+    // TODO: Naive way of counting bytes, use `bytecount` crate
+    // TODO: usize to i32 _can_ overflow
+    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_wrap)]
+    #[allow(clippy::naive_bytecount)]
     fn get_punctuation_emphasis(text: &str) -> f64 {
-        let emark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'!').count() as i32;
-        let qmark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'?').count() as i32;
+        let emark_count = text.as_bytes().iter().filter(|b| **b == b'!').count() as i32;
+        let qmark_count = text.as_bytes().iter().filter(|b| **b == b'?').count() as i32;
 
         let emark_emph = f64::from(min(emark_count, MAX_EMARK)) * EMARK_INCR;
         let mut qmark_emph = f64::from(qmark_count) * QMARK_INCR;
@@ -86,6 +94,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn test_parsed_text() {
         let messy_text = "WOAH!!! ,Who? DO u Think you're?? :) :D :^(";
         let parsed_messy = ParsedText::from_text(messy_text);

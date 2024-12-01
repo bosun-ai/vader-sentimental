@@ -2,7 +2,12 @@ use std::cmp::min;
 
 use crate::{
     parsed_text::ParsedText,
-    static_resources::{BOOSTER_DICT, BOOSTER_DICT_EARLY_RETURN, C_INCR, EMOJI_LEXICON, LEXICON, NEGATION_SCALAR, SPECIAL_CASE_EARLY_RETURN, SPECIAL_CASE_IDIOMS, STATIC_AT, STATIC_BUT, STATIC_DOUBT, STATIC_KIND, STATIC_LEAST, STATIC_NEVER, STATIC_OF, STATIC_SO, STATIC_THIS, STATIC_VERY, STATIC_WITHOUT},
+    static_resources::{
+        BOOSTER_DICT, BOOSTER_DICT_EARLY_RETURN, C_INCR, EMOJI_LEXICON, LEXICON, NEGATION_SCALAR,
+        SPECIAL_CASE_EARLY_RETURN, SPECIAL_CASE_IDIOMS, STATIC_AT, STATIC_BUT, STATIC_DOUBT,
+        STATIC_KIND, STATIC_LEAST, STATIC_NEVER, STATIC_OF, STATIC_SO, STATIC_THIS, STATIC_VERY,
+        STATIC_WITHOUT,
+    },
     util::{is_all_caps, is_negated, normalize_score, scalar_inc_dec, sum_sentiment_scores},
 };
 use hashbrown::HashMap;
@@ -14,23 +19,27 @@ pub struct SentimentIntensityAnalyzer<'a> {
 }
 
 impl SentimentIntensityAnalyzer<'_> {
-    #[must_use] pub fn new() -> SentimentIntensityAnalyzer<'static> {
+    #[must_use]
+    pub fn new() -> SentimentIntensityAnalyzer<'static> {
         SentimentIntensityAnalyzer {
             lexicon: &LEXICON,
             emoji_lexicon: &EMOJI_LEXICON,
         }
     }
 
-    #[must_use] pub fn from_lexicon<'b>(
-        _lexicon: &'b HashMap<UniCase<&str>, f64>,
+    #[must_use]
+    pub fn from_lexicon<'b>(
+        lexicon: &'b HashMap<UniCase<&str>, f64>,
     ) -> SentimentIntensityAnalyzer<'b> {
         SentimentIntensityAnalyzer {
-            lexicon: _lexicon,
+            lexicon,
             emoji_lexicon: &EMOJI_LEXICON,
         }
     }
 
-    #[must_use] pub fn get_total_sentiment(
+    #[must_use]
+    #[allow(clippy::similar_names)]
+    pub fn get_total_sentiment(
         &self,
         sentiments: Vec<f64>,
         punct_emph_amplifier: f64,
@@ -67,7 +76,9 @@ impl SentimentIntensityAnalyzer<'_> {
         ])
     }
 
-    #[must_use] pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
+    #[must_use]
+    #[allow(clippy::if_same_then_else)]
+    pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
         let text = self.append_emoji_descriptions(text);
         let parsedtext = ParsedText::from_text(&text);
         let tokens = &parsedtext.tokens;
@@ -87,7 +98,8 @@ impl SentimentIntensityAnalyzer<'_> {
     }
 
     //Removes emoji and appends their description to the end the input text
-    #[must_use] pub fn append_emoji_descriptions(&self, text: &str) -> String {
+    #[must_use]
+    pub fn append_emoji_descriptions(&self, text: &str) -> String {
         let mut result = String::new();
         let mut prev_space = true;
         for chr in text.chars() {
@@ -180,20 +192,22 @@ fn negation_check(valence: f64, tokens: &[UniCase<&str>], start_i: usize, i: usi
 
 // If "but" is in the tokens, scales down the sentiment of words before "but" and
 // adds more emphasis to the words after
-pub fn but_check(tokens: &[UniCase<&str>], sentiments: &mut Vec<f64>) {
+#[allow(clippy::comparison_chain)]
+pub fn but_check(tokens: &[UniCase<&str>], sentiments: &mut [f64]) {
     if let Some(but_index) = tokens.iter().position(|&s| s == *STATIC_BUT) {
-        for i in 0..sentiments.len() {
+        for (i, sentiment) in sentiments.iter_mut().enumerate() {
             if i < but_index {
-                sentiments[i] *= 0.5;
+                *sentiment *= 0.5;
             } else if i > but_index {
-                sentiments[i] *= 1.5;
+                *sentiment *= 1.5;
             }
         }
     }
 }
 
-fn least_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
-    let mut valence = _valence;
+#[allow(clippy::if_same_then_else)]
+fn least_check(valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
+    let mut valence = valence;
     if i > 1
         && tokens[i - 1] == *STATIC_LEAST
         && tokens[i - 2] == *STATIC_AT
@@ -222,9 +236,9 @@ fn least_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
 //     0f64
 // }
 
-fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
+fn special_idioms_check(valence: f64, tokens: &[UniCase<&str>], i: usize) -> f64 {
     debug_assert!(i > 2);
-    let mut valence = _valence;
+    let mut valence = valence;
     let mut end_i = i + 1;
 
     //if i isn't the last index

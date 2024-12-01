@@ -3,7 +3,7 @@ use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criteri
 fn run_vader_sentimental(sentence: &str) {
     let analyzer = vader_sentimental::SentimentIntensityAnalyzer::new();
 
-    analyzer.polarity_scores(sentence);
+    let _ = analyzer.polarity_scores(sentence);
 }
 
 static SENTENCES: &[&str] = &[
