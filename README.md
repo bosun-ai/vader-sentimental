@@ -1,10 +1,10 @@
-> NOTE: This is a fork of [the earlier rust implementation](https://github.com/ckw017/vader-sentiment-rust). `vader-sentimental` is a more ideomatic rust implementation with significantly improved performance. Performance increase ranges from 2x to 10x. Varying based on tokens being present in the `SPECIAL_CASE_IDEOMS` and `BOOSTER_DICT`.
+> NOTE: This is a fork of [the earlier rust implementation](https://github.com/ckw017/vader-sentiment-rust). `vader-sentimental` is a more ideomatic rust implementation with significantly improved performance. Performance increase ranges from 1.5x to 10x (with room for improvement).
 
 # VADER-Sentiment-Analysis
 
 VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-based sentiment analysis tool that is _specifically attuned to sentiments expressed in social media_. It is fully open-sourced under the [MIT License](http://choosealicense.com/). **This is a port of the original module**, which was written in Python. If you'd like to make a contribution, please checkout [the original author's work here](https://github.com/cjhutto/vaderSentiment).
 
-# Use Cases
+## Use Cases
 
     * examples of typical use cases for sentiment analysis, including proper handling of sentences with:
 
@@ -24,7 +24,7 @@ VADER (Valence Aware Dictionary and sEntiment Reasoner) is a lexicon and rule-ba
     * examples of a concept for assessing the sentiment of images, video, or other tagged multimedia content
     * if you have access to the Internet, the demo has an example of how VADER can work with analyzing sentiment of texts in other languages (non-English text sentences).
 
-# Usage
+## Usage
 
 ### Code
 
@@ -55,7 +55,22 @@ SentimentIntensity {
 }
 ```
 
-# Citation Information
+## Performance
+
+`vader-sentimental` is signficantly faster than the original implementation. Criterion benches are provided.
+
+<div align="center">
+    <img src="https://github.com/bosun-ai/vader-sentimental/blob/master/images/performance.svg" alt="performance" width="100%" >
+</div>
+
+Main improvements include:
+
+- Reduce the number of allocations
+- Use a faster hashmap
+- More effective loops
+- Early return when possible
+
+## Citation Information
 
 If you use either the dataset or any of the VADER sentiment analysis tools (VADER sentiment lexicon or Rust code for rule-based sentiment analysis engine) in your research, please cite the above paper. For example:
 
