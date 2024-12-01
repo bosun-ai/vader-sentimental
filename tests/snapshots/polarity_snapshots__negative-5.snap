@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+Other sentiment analysis tools can be quite bad.----------------- SentimentIntensity {
+    neg: 0.3333333333333333,
+    neu: 0.6666666666666666,
+    pos: 0.0,
+    compound: -0.5423261445466404,
+}

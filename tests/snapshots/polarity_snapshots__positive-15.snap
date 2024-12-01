@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+Catch utf-8 emoji such as 💘 and 💋 and 😁-------------------------- SentimentIntensity {
+    neg: 0.0,
+    neu: 0.7211538461538461,
+    pos: 0.27884615384615385,
+    compound: 0.7003492917357613,
+}

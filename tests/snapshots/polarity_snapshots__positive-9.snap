@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+At least it isn't a horrible book.------------------------------- SentimentIntensity {
+    neg: 0.0,
+    neu: 0.6369426751592357,
+    pos: 0.36305732484076436,
+    compound: 0.43102002306105164,
+}

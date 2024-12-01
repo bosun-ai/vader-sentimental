@@ -1,14 +1,53 @@
 [package]
-name = "vader_sentiment"
-version = "0.1.1"
-authors = ["Chris <chriswong21@berkeley.edu>", "Mariana Meireles <mariana@psychonautgirl.space>"]
+name = "vader-sentimental"
+version = "0.1.0"
+authors = [
+  "Timon Vonk <mail@timonv.nl>",
+  "Chris <chriswong21@berkeley.edu>",
+  "Mariana Meireles <mariana@psychonautgirl.space>",
+]
 license = "MIT"
-description = "Bindings for Rust from the original Python VaderSentiment analysis tool."
-repository = "https://github.com/ckw017/vader-sentiment-rust"
-documentation = "https://docs.rs/vader_sentiment"
+description = "A faster Rust version from the original Python VaderSentiment analysis tool."
+repository = "https://github.com/bosun-ai/vader-sentimental"
+documentation = "https://docs.rs/vader_sentimental"
+edition = "2021"
+keywords = ["nlp", "text-analysis", "sentiment-analysis"]
+categories = ["text-processing", "parsing"]
 
 [dependencies]
 regex = "1.3.1"
 maplit = "1.0.2"
 lazy_static = "1.4.0"
 unicase = "2.6.0"
+clap = { version = "4.5.21", features = ["derive"] }
+hashbrown = "0.15.2"
+
+[dev-dependencies]
+insta = "1.41.1"
+criterion = { version = "0.5.1", features = ["html_reports"] }
+vader_sentiment = { version = "0.1.1" }
+
+[profile.bench]
+inherits = "release"
+debug = true
+
+[[example]]
+name = "demo"
+
+[[bench]]
+name = "compare"
+harness = false
+
+[[bench]]
+name = "sentimental"
+harness = false
+
+[lints.rust]
+unsafe_code = "forbid"
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(coverage,coverage_nightly)',
+] }
+
+[lints.clippy]
+cargo = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }

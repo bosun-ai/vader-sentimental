@@ -1,0 +1,10 @@
+---
+source: tests/polarity_snapshots.rs
+expression: "format!(\"{:-<65} {:#?}\", sentence, scores)"
+---
+VADER is such a badass!------------------------------------------ SentimentIntensity {
+    neg: 0.0,
+    neu: 0.5179558011049724,
+    pos: 0.4820441988950276,
+    compound: 0.4199213541266714,
+}
