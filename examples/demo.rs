@@ -42,7 +42,7 @@ pub fn main() {
     println!("  -- sentiment laden initialisms and acronyms (for example: 'lol') \n");
     for sentence in sentences {
         let scores = analyzer.polarity_scores(sentence);
-        println!("{:-<65} {:#?}", sentence, scores);
+        println!("{sentence:-<65} {scores:#?}");
     }
     println!("----------------------------------------------------");
     println!(" - About the scoring: ");
@@ -76,7 +76,7 @@ pub fn main() {
     println!("  -- special uses of 'least' as negation versus comparison \n");
     for sentence in tricky_sentences {
         let scores = analyzer.polarity_scores(sentence);
-        println!("{:-<65} {:#?}", sentence, scores);
+        println!("{sentence:-<65} {scores:#?}");
     }
     println!("----------------------------------------------------");
 }

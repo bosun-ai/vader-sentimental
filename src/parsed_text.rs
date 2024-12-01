@@ -2,7 +2,7 @@ use std::cmp::min;
 
 use unicase::UniCase;
 
-use crate::static_resources::*;
+use crate::static_resources::{EMARK_INCR, MAX_EMARK, MAX_QMARK, MAX_QMARK_INCR, PUNCTUATION, QMARK_INCR};
 use crate::util::is_all_caps;
 
 /**
@@ -54,7 +54,7 @@ impl<'a> ParsedText<'a> {
     // Determines if message has a mix of both all caps and non all caps words
     pub fn has_mixed_caps<S: AsRef<str>>(tokens: &[S]) -> bool {
         let (mut has_caps, mut has_non_caps) = (false, false);
-        for token in tokens.iter() {
+        for token in tokens {
             if is_all_caps(token.as_ref()) {
                 has_caps = true;
             } else {
@@ -72,8 +72,8 @@ impl<'a> ParsedText<'a> {
         let emark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'!').count() as i32;
         let qmark_count: i32 = text.as_bytes().iter().filter(|b| **b == b'?').count() as i32;
 
-        let emark_emph = min(emark_count, MAX_EMARK) as f64 * EMARK_INCR;
-        let mut qmark_emph = (qmark_count as f64) * QMARK_INCR;
+        let emark_emph = f64::from(min(emark_count, MAX_EMARK)) * EMARK_INCR;
+        let mut qmark_emph = f64::from(qmark_count) * QMARK_INCR;
         if qmark_count > MAX_QMARK {
             qmark_emph = MAX_QMARK_INCR;
         }

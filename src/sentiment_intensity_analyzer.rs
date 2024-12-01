@@ -2,7 +2,7 @@ use std::cmp::min;
 
 use crate::{
     parsed_text::ParsedText,
-    static_resources::*,
+    static_resources::{BOOSTER_DICT, BOOSTER_DICT_EARLY_RETURN, C_INCR, EMOJI_LEXICON, LEXICON, NEGATION_SCALAR, SPECIAL_CASE_EARLY_RETURN, SPECIAL_CASE_IDIOMS, STATIC_AT, STATIC_BUT, STATIC_DOUBT, STATIC_KIND, STATIC_LEAST, STATIC_NEVER, STATIC_OF, STATIC_SO, STATIC_THIS, STATIC_VERY, STATIC_WITHOUT},
     util::{is_all_caps, is_negated, normalize_score, scalar_inc_dec, sum_sentiment_scores},
 };
 use hashbrown::HashMap;
@@ -14,14 +14,14 @@ pub struct SentimentIntensityAnalyzer<'a> {
 }
 
 impl SentimentIntensityAnalyzer<'_> {
-    pub fn new() -> SentimentIntensityAnalyzer<'static> {
+    #[must_use] pub fn new() -> SentimentIntensityAnalyzer<'static> {
         SentimentIntensityAnalyzer {
             lexicon: &LEXICON,
             emoji_lexicon: &EMOJI_LEXICON,
         }
     }
 
-    pub fn from_lexicon<'b>(
+    #[must_use] pub fn from_lexicon<'b>(
         _lexicon: &'b HashMap<UniCase<&str>, f64>,
     ) -> SentimentIntensityAnalyzer<'b> {
         SentimentIntensityAnalyzer {
@@ -30,7 +30,7 @@ impl SentimentIntensityAnalyzer<'_> {
         }
     }
 
-    pub fn get_total_sentiment(
+    #[must_use] pub fn get_total_sentiment(
         &self,
         sentiments: Vec<f64>,
         punct_emph_amplifier: f64,
@@ -53,10 +53,10 @@ impl SentimentIntensityAnalyzer<'_> {
                 neg_sum -= punct_emph_amplifier;
             }
 
-            let total = pos_sum + neg_sum.abs() + (neu_count as f64);
+            let total = pos_sum + neg_sum.abs() + f64::from(neu_count);
             pos = (pos_sum / total).abs();
             neg = (neg_sum / total).abs();
-            neu = (neu_count as f64 / total).abs();
+            neu = (f64::from(neu_count) / total).abs();
         }
 
         HashMap::from([
@@ -67,7 +67,7 @@ impl SentimentIntensityAnalyzer<'_> {
         ])
     }
 
-    pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
+    #[must_use] pub fn polarity_scores(&self, text: &str) -> HashMap<&str, f64> {
         let text = self.append_emoji_descriptions(text);
         let parsedtext = ParsedText::from_text(&text);
         let tokens = &parsedtext.tokens;
@@ -87,7 +87,7 @@ impl SentimentIntensityAnalyzer<'_> {
     }
 
     //Removes emoji and appends their description to the end the input text
-    pub fn append_emoji_descriptions(&self, text: &str) -> String {
+    #[must_use] pub fn append_emoji_descriptions(&self, text: &str) -> String {
         let mut result = String::new();
         let mut prev_space = true;
         for chr in text.chars() {
@@ -116,7 +116,7 @@ impl SentimentIntensityAnalyzer<'_> {
                 if valence > 0f64 {
                     valence += C_INCR;
                 } else {
-                    valence -= C_INCR
+                    valence -= C_INCR;
                 }
             }
             for start_i in 0..3 {
@@ -126,7 +126,7 @@ impl SentimentIntensityAnalyzer<'_> {
                     if start_i == 1 {
                         s *= 0.95;
                     } else if start_i == 2 {
-                        s *= 0.9
+                        s *= 0.9;
                     }
                     valence += s;
                     valence = negation_check(valence, tokens, start_i, i);
@@ -154,9 +154,9 @@ fn negation_check(valence: f64, tokens: &[UniCase<&str>], start_i: usize, i: usi
         if tokens[i - 2] == *STATIC_NEVER
             && (tokens[i - 1] == *STATIC_SO || tokens[i - 1] == *STATIC_THIS)
         {
-            valence *= 1.25
+            valence *= 1.25;
         } else if tokens[i - 2] == *STATIC_WITHOUT && tokens[i - 1] == *STATIC_DOUBT {
-            valence *= 1.0
+            valence *= 1.0;
         } else if is_negated(&tokens[i - start_i - 1]) {
             valence *= NEGATION_SCALAR;
         }
@@ -166,7 +166,7 @@ fn negation_check(valence: f64, tokens: &[UniCase<&str>], start_i: usize, i: usi
             || tokens[i - 1] == *STATIC_SO
             || tokens[i - 1] == *STATIC_THIS
         {
-            valence *= 1.25
+            valence *= 1.25;
         } else if tokens[i - 3] == *STATIC_WITHOUT && tokens[i - 2] == *STATIC_DOUBT
             || tokens[i - 1] == *STATIC_DOUBT
         {
@@ -236,7 +236,7 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
     if tokens.iter().any(|t| SPECIAL_CASE_EARLY_RETURN.contains(t)) {
         let target_window = tokens[(i - 3)..end_i]
             .iter()
-            .map(|u| u.as_ref())
+            .map(std::convert::AsRef::as_ref)
             .collect::<Vec<&str>>()
             .join(" ")
             .to_lowercase();
@@ -252,7 +252,7 @@ fn special_idioms_check(_valence: f64, tokens: &[UniCase<&str>], i: usize) -> f6
     if tokens.iter().any(|t| BOOSTER_DICT_EARLY_RETURN.contains(t)) {
         let prev_three = tokens[(i - 3)..i]
             .iter()
-            .map(|u| u.as_ref())
+            .map(std::convert::AsRef::as_ref)
             .collect::<Vec<&str>>()
             .join(" ")
             .to_lowercase();

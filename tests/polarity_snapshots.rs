@@ -35,7 +35,7 @@ fn test_positive() {
             .into_values()
             .collect::<Vec<_>>();
 
-        scores.sort_by(|a, b| a.total_cmp(b));
+        scores.sort_by(f64::total_cmp);
 
         insta::assert_snapshot!(format!("{:-<65} {:#?}", sentence, scores));
     }
@@ -66,7 +66,7 @@ fn test_negative() {
             .into_values()
             .collect::<Vec<_>>();
 
-        scores.sort_by(|a, b| a.total_cmp(b));
+        scores.sort_by(f64::total_cmp);
 
         insta::assert_snapshot!(format!("{:-<65} {:#?}", sentence, scores));
     }

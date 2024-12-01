@@ -115,10 +115,10 @@ lazy_static! {
 }
 
 /**
- * Takes the raw text of the lexicon files and creates HashMaps
+ * Takes the raw text of the lexicon files and creates `HashMaps`
  **/
 pub fn parse_raw_lexicon(raw_lexicon: &str) -> HashMap<UniCase<&str>, f64> {
-    let lines = raw_lexicon.trim_end_matches("\n").split("\n");
+    let lines = raw_lexicon.trim_end_matches('\n').split('\n');
     let mut lex_dict = HashMap::new();
     for line in lines {
         if line.is_empty() {
@@ -133,7 +133,7 @@ pub fn parse_raw_lexicon(raw_lexicon: &str) -> HashMap<UniCase<&str>, f64> {
 }
 
 pub fn parse_raw_emoji_lexicon(raw_emoji_lexicon: &str) -> HashMap<&str, &str> {
-    let lines = raw_emoji_lexicon.trim_end_matches("\n").split("\n");
+    let lines = raw_emoji_lexicon.trim_end_matches('\n').split('\n');
     let mut emoji_dict = HashMap::new();
     for line in lines {
         if line.is_empty() {

@@ -20,5 +20,5 @@ fn main() {
     let scores = analyzer.polarity_scores(&args.text);
 
     println!("Polarity scores");
-    println!("{:#?}", scores);
+    println!("{scores:#?}");
 }
