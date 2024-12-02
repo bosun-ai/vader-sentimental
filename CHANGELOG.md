@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1](https://github.com/bosun-ai/vader-sentimental/compare/v0.1.0...v0.1.1) - 2024-12-01
+
+### Other
+
+- *(deps)* Remove maplit
+- release v0.1.0 ([#2](https://github.com/bosun-ai/vader-sentimental/pull/2))
+
 ## [0.1.0](https://github.com/bosun-ai/vader-sentimental/releases/tag/v0.1.0) - 2024-12-01
 
 ### Added
