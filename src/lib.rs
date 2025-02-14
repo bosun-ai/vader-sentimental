@@ -7,4 +7,5 @@ mod sentiment_intensity_analyzer;
 mod static_resources;
 mod util;
 
+pub use crate::sentiment_intensity_analyzer::SentimentIntensity;
 pub use crate::sentiment_intensity_analyzer::SentimentIntensityAnalyzer;
