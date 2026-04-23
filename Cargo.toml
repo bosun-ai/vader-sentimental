@@ -63,3 +63,4 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 [lints.clippy]
 cargo = { level = "warn", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
+non_std_lazy_statics = "allow"
