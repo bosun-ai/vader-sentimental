@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3](https://github.com/bosun-ai/vader-sentimental/compare/v0.1.2...v0.1.3) - 2026-05-08
+
+### Other
+
+- Make clap optional via default-enabled cli feature ([#6](https://github.com/bosun-ai/vader-sentimental/pull/6))
+
 ## [0.1.2](https://github.com/bosun-ai/vader-sentimental/compare/v0.1.1...v0.1.2) - 2025-02-14
 
 ### Added
